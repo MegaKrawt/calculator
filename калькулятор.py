@@ -55,7 +55,7 @@ def update():
             for k, v in di:
                 ds += f'{k}={v}  '
             dict_Label_ctk.configure(text=ds)
-        except: pass
+        except Exception as e: print(e)
 
         # --- ПРОВЕРКА ЗАПРЕЩЕННЫХ ИМЕН ---
         for k in d:
@@ -78,9 +78,10 @@ def update():
 
 
 def on_enter(a):
-    histore_text_box_ctk.insert('0.0', entry_ctk.get() + ' '  + answer_Label_ctk._text + '\n')
-    entry_ctk.delete('0', 'end')
-    entry_ctk.insert('0', answer_Label_ctk._text[2::])
+    if not 'Error' in answer_Label_ctk._text:
+        histore_text_box_ctk.insert('0.0', entry_ctk.get() + ' '  + answer_Label_ctk._text + '\n')
+        entry_ctk.delete('0', 'end')
+        entry_ctk.insert('0', answer_Label_ctk._text[2::])
 
 histor_count = 0
 
