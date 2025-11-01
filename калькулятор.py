@@ -69,8 +69,9 @@ def update():
                 ds += f'{k}={v}  '
                 dst += f'{k}={v}\n'
             dict_Label_ctk.configure(text=ds)
-            dict_CTkTextbox.delete('0.0', 'end')
-            dict_CTkTextbox.insert('0.0', dst)
+            if dict_CTkTextbox.get('0.0', 'end-1c') != dst:
+                dict_CTkTextbox.delete('0.0', 'end')
+                dict_CTkTextbox.insert('0.0', dst)
         except: pass
 
         # --- ПРОВЕРКА ЗАПРЕЩЕННЫХ ИМЕН ---
