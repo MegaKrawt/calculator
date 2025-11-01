@@ -4,13 +4,14 @@ import webbrowser
 from PIL import Image
 import json
 
-version = '1.2.1'
+version = '1.3'
 
 win = customtkinter.CTk()
 win.title('калькулятор с переменными. '+version)
 win.iconbitmap("data/icon.ico")
 win.geometry('800x500')
 win_x, win_y = win.geometry().split('+')[0].split('x')
+
 
 FORBIDDEN_NAMES = ['False', 'None', 'True', 'and', 'or', 'not', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield']
 
@@ -62,9 +63,13 @@ def update():
 
             di = d.items()
             ds = ''
+            dst = ''
             for k, v in di:
                 ds += f'{k}={v}  '
+                dst += f'{k}={v}\n'
             dict_Label_ctk.configure(text=ds)
+            dict_CTkTextbox.delete('0.0', 'end')
+            dict_CTkTextbox.insert('0.0', dst)
         except: pass
 
         # --- ПРОВЕРКА ЗАПРЕЩЕННЫХ ИМЕН ---
@@ -80,12 +85,14 @@ def update():
     except Exception as e: answer_Label_ctk.configure(text='Error: ' + str(e))
 
     entry_ctk.configure(width=win_x-20-50)
-    text_box_ctk.configure(width=win_x//2-20, height=win_y-120); text_box_ctk.place(x=win_x//2+10, y=150)
-    histore_text_box_ctk.configure(width=win_x//2-10, height=win_y-120); histore_text_box_ctk.place(x=10, y=150)
     help_button_ctk.place(x=win_x - 40, y=win_y - 40)
     histore_button_ctk.place(x=win_x - 50, y=10)
     save_button_ctk.place(x=win_x - 50, y=60)
     histore_name_CTkEntry.place(x=win_x-200, y=110)
+    frame_for_gird.configure(height=win_y-150)
+    histore_text_box_ctk.grid(column=0, row=0, sticky='NS', padx=5)
+    text_box_ctk.grid(column=1, row=0, sticky='NSEW', padx=5)
+    dict_CTkTextbox.grid(column=2, row=0, sticky='NSEW', padx=5)
 
     win.after(100, update)
 
@@ -174,12 +181,22 @@ entry_ctk = customtkinter.CTkEntry(win, width=780, height=50, font=(None, 30)); 
 entry_ctk.bind("<Return>", on_enter); entry_ctk.bind('<Up>', on_up); entry_ctk.bind('<Down>', on_down); entry_ctk.bind('<Key>', on_any_key)
 answer_Label_ctk = customtkinter.CTkLabel(win, font=(None, 30)); answer_Label_ctk.place(x=10, y=70)
 dict_Label_ctk = customtkinter.CTkLabel(win, font=(None, 30)); dict_Label_ctk.place(x=10, y=110)
-text_box_ctk = customtkinter.CTkTextbox(win, 380, 380, font=(None, 30)); text_box_ctk.place(x=400, y=150)
-histore_text_box_ctk = customtkinter.CTkTextbox(win, 380, 380, font=(None, 30)); histore_text_box_ctk.place(x=0, y=150)
-help_button_ctk = customtkinter.CTkButton(win, 40, 40, font=(None, 30), text='?', command=lambda: webbrowser.open("https://drive.google.com/drive/folders/14-Rg0btuw20MMrWbaBTAtgdaoYBpsaMm?usp=sharing"))
 histore_button_ctk = customtkinter.CTkButton(win, 1, 1, text='', image=histore_image, command=open_histore, fg_color='#dddddd')
 save_button_ctk = customtkinter.CTkButton(win, 1, 1, text='', image=save_image, command=save_in_histore, fg_color='#dddddd')
 histore_name_CTkEntry = customtkinter.CTkEntry(win, width=200, height=30, font=(None, 20), placeholder_text='название')
+
+frame_for_gird = customtkinter.CTkFrame(win); frame_for_gird.place(x=0,y=150,relwidth=1.0); frame_for_gird.grid_propagate(False)
+frame_for_gird.grid_columnconfigure(0, weight=0)
+frame_for_gird.grid_columnconfigure(1, weight=1)
+frame_for_gird.grid_columnconfigure(2, weight=0)
+frame_for_gird.grid_rowconfigure(0, weight=1)
+
+histore_text_box_ctk = customtkinter.CTkTextbox(frame_for_gird, 200, 50, font=(None, 30))
+text_box_ctk = customtkinter.CTkTextbox(frame_for_gird, 50, 50, font=(None, 30))
+dict_CTkTextbox = customtkinter.CTkTextbox(frame_for_gird, 200, 50, font=(None, 30))
+
+help_button_ctk = customtkinter.CTkButton(win, 40, 40, font=(None, 30), text='?', command=lambda: webbrowser.open("https://drive.google.com/drive/folders/14-Rg0btuw20MMrWbaBTAtgdaoYBpsaMm?usp=sharing"))
+
 
 update()
 
