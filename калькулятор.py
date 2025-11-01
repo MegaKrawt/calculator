@@ -4,7 +4,7 @@ import webbrowser
 from PIL import Image
 import json
 
-version = '1.3'
+version = '1.3.1'
 
 win = customtkinter.CTk()
 win.title('калькулятор с переменными. '+version)
@@ -12,6 +12,7 @@ win.iconbitmap("data/icon.ico")
 win.geometry('800x500')
 win_x, win_y = win.geometry().split('+')[0].split('x')
 
+font_size = 25
 
 FORBIDDEN_NAMES = ['False', 'None', 'True', 'and', 'or', 'not', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield']
 
@@ -90,9 +91,6 @@ def update():
     save_button_ctk.place(x=win_x - 50, y=60)
     histore_name_CTkEntry.place(x=win_x-200, y=110)
     frame_for_gird.configure(height=win_y-150)
-    histore_text_box_ctk.grid(column=0, row=0, sticky='NS', padx=5)
-    text_box_ctk.grid(column=1, row=0, sticky='NSEW', padx=5)
-    dict_CTkTextbox.grid(column=2, row=0, sticky='NSEW', padx=5)
 
     win.after(100, update)
 
@@ -177,6 +175,13 @@ def save_in_histore():
     with open('data/histore.json', 'w', encoding='utf-8') as file:
         json.dump(histore_dict, file, indent=4, ensure_ascii=False) # ensure_ascii=False
 
+def font_reset(v):
+    font_size = v
+    histore_text_box_ctk.configure(font=(None, font_size))
+    text_box_ctk.configure(font=(None, font_size))
+    dict_CTkTextbox.configure(font=(None, font_size))
+
+
 entry_ctk = customtkinter.CTkEntry(win, width=780, height=50, font=(None, 30)); entry_ctk.place(x=10, y=10)
 entry_ctk.bind("<Return>", on_enter); entry_ctk.bind('<Up>', on_up); entry_ctk.bind('<Down>', on_down); entry_ctk.bind('<Key>', on_any_key)
 answer_Label_ctk = customtkinter.CTkLabel(win, font=(None, 30)); answer_Label_ctk.place(x=10, y=70)
@@ -188,12 +193,19 @@ histore_name_CTkEntry = customtkinter.CTkEntry(win, width=200, height=30, font=(
 frame_for_gird = customtkinter.CTkFrame(win); frame_for_gird.place(x=0,y=150,relwidth=1.0); frame_for_gird.grid_propagate(False)
 frame_for_gird.grid_columnconfigure(0, weight=0)
 frame_for_gird.grid_columnconfigure(1, weight=1)
-frame_for_gird.grid_columnconfigure(2, weight=0)
-frame_for_gird.grid_rowconfigure(0, weight=1)
+frame_for_gird.grid_columnconfigure(2, weight=1)
+frame_for_gird.grid_rowconfigure(0, weight=0)
+frame_for_gird.grid_rowconfigure(1, weight=1)
 
-histore_text_box_ctk = customtkinter.CTkTextbox(frame_for_gird, 200, 50, font=(None, 30))
-text_box_ctk = customtkinter.CTkTextbox(frame_for_gird, 50, 50, font=(None, 30))
-dict_CTkTextbox = customtkinter.CTkTextbox(frame_for_gird, 200, 50, font=(None, 30))
+font_slider = customtkinter.CTkSlider(frame_for_gird, command=font_reset, from_=10, to=50, number_of_steps=40); font_slider.set(font_size)
+histore_text_box_ctk = customtkinter.CTkTextbox(frame_for_gird, 200, 50, font=(None, font_size))
+text_box_ctk = customtkinter.CTkTextbox(frame_for_gird, 300, 50, font=(None, font_size))
+dict_CTkTextbox = customtkinter.CTkTextbox(frame_for_gird, 200, 50, font=(None, font_size))
+
+histore_text_box_ctk.grid(column=0, row=1, sticky='NS', padx=5, rowspan=1)
+font_slider.grid(column=0, row=0, sticky='N', padx=5, rowspan=1)
+text_box_ctk.grid(column=1, row=0, sticky='NSEW', padx=5, rowspan=2)
+dict_CTkTextbox.grid(column=2, row=0, sticky='NSEW', padx=5, rowspan=2)
 
 help_button_ctk = customtkinter.CTkButton(win, 40, 40, font=(None, 30), text='?', command=lambda: webbrowser.open("https://drive.google.com/drive/folders/14-Rg0btuw20MMrWbaBTAtgdaoYBpsaMm?usp=sharing"))
 
