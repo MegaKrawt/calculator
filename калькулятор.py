@@ -1,11 +1,10 @@
 import time
-
 import customtkinter
 import webbrowser
 from PIL import Image
 import json
 
-version = '1.1'
+version = '1.2'
 
 win = customtkinter.CTk()
 win.title('калькулятор с переменными. '+version)
@@ -84,6 +83,7 @@ def update():
     help_button_ctk.place(x=win_x - 40, y=win_y - 40)
     histore_button_ctk.place(x=win_x - 50, y=10)
     save_button_ctk.place(x=win_x - 50, y=60)
+    histore_name_CTkEntry.place(x=win_x-200, y=110)
 
     win.after(100, update)
 
@@ -117,7 +117,7 @@ def on_any_key(a):
     if a.char != '': histor_count=0
 
 def open_histore():
-    global histore_CTkOptionMenu, frame_histore
+    global histore_CTkOptionMenu, frame_histore, histore_close_CTkButton
     win_x, win_y = map(int, win.geometry().split('+')[0].split('x'))
     try:
         with open('data/histore.json', 'r', encoding='utf-8') as file:
@@ -128,8 +128,22 @@ def open_histore():
             histore_dict = dict()
     frame_histore = customtkinter.CTkFrame(win, 300, win_x)
     frame_histore.pack(side='right'); frame_histore.pack_propagate(False)
-    histore_CTkOptionMenu = customtkinter.CTkOptionMenu(frame_histore, values=list(histore_dict.keys()), command=lambda v: open_histore2(v, histore_dict))
-    histore_CTkOptionMenu.pack(pady=10)
+    histore_close_CTkButton = customtkinter.CTkButton(frame_histore, 40, 40, fg_color='#FF0000', font=(None, 30), text='X', command=lambda: frame_histore.destroy()).place(x=0, y=0)
+    # histore_CTkOptionMenu = customtkinter.CTkOptionMenu(frame_histore, values=list(histore_dict.keys()), command=lambda v: open_histore2(v, histore_dict)).pack(pady=10)
+
+    # --- 4. Прокручиваемая рамка для кнопок (CTkScrollableFrame) ---
+    scrollable_frame = customtkinter.CTkScrollableFrame(frame_histore, 280, win_x)
+    scrollable_frame.grid_columnconfigure(0, weight=1)  # Кнопки будут растягиваться внутри
+    scrollable_frame.pack(pady=(50,0))
+
+    option_names = histore_dict.keys()
+
+    for i, name in enumerate(option_names):
+        # Создаем кнопку, привязывая ее к scrollable_frame
+        button = customtkinter.CTkButton(scrollable_frame, text=name, command=lambda n=name: open_histore2(n, histore_dict),
+                                         height=40, corner_radius=5)
+        # Размещаем кнопку в scrollable_frame. Grid-строка увеличивается с каждой кнопкой.
+        button.grid(row=i, column=0, padx=5, pady=5, sticky="ew")
 
 def open_histore2(v, histore_dict):
     data = histore_dict[v]
@@ -141,7 +155,7 @@ def open_histore2(v, histore_dict):
 
 def save_in_histore():
     # {"31.10.2025":{e:'', b:''} }
-    new = {str(entry_ctk.get()):{'e':entry_ctk.get(), 'b':text_box_ctk.get('0.0', 'end')}}
+    new = {str(histore_name_CTkEntry.get()):{'e':entry_ctk.get(), 'b':text_box_ctk.get('0.0', 'end')}}
     try:
         with open('data/histore.json', 'r', encoding='utf-8') as file:
             histore_dict = dict(json.load(file))
@@ -160,6 +174,7 @@ histore_text_box_ctk = customtkinter.CTkTextbox(win, 380, 380, font=(None, 30));
 help_button_ctk = customtkinter.CTkButton(win, 40, 40, font=(None, 30), text='?', command=lambda: webbrowser.open("https://drive.google.com/drive/folders/14-Rg0btuw20MMrWbaBTAtgdaoYBpsaMm?usp=sharing"))
 histore_button_ctk = customtkinter.CTkButton(win, 1, 1, text='', image=histore_image, command=open_histore, fg_color='#dddddd')
 save_button_ctk = customtkinter.CTkButton(win, 1, 1, text='', image=save_image, command=save_in_histore, fg_color='#dddddd')
+histore_name_CTkEntry = customtkinter.CTkEntry(win, width=200, height=30, font=(None, 20), placeholder_text='название')
 
 update()
 
