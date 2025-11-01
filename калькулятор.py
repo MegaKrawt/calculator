@@ -4,7 +4,7 @@ import webbrowser
 from PIL import Image
 import json
 
-version = '1.2'
+version = '1.2.1'
 
 win = customtkinter.CTk()
 win.title('калькулятор с переменными. '+version)
@@ -56,7 +56,9 @@ def update():
         d = dict()
         try:
             for i in text_box_ctk.get('1.0', 'end-1c').split('\n'):
-                d[i.split('=')[0]] = eval(i.split('=')[1], {'__builtins__': None}, d)
+                try:
+                    d[i.split('=')[0]] = round(eval(i.split('=')[1], {'__builtins__': None}, d), 10)
+                except: pass
 
             di = d.items()
             ds = ''
@@ -74,7 +76,7 @@ def update():
         #         raise ValueError(f"'{k}' является зарезервированным словом.")
 
         d.update(MATH_FUNCTIONS)
-        answer_Label_ctk.configure(text='= ' + str(round(eval(entry_ctk.get(), {'__builtins__': None}, d), 15)))
+        answer_Label_ctk.configure(text='= ' + str(round(eval(entry_ctk.get(), {'__builtins__': None}, d), 10)))
     except Exception as e: answer_Label_ctk.configure(text='Error: ' + str(e))
 
     entry_ctk.configure(width=win_x-20-50)
@@ -149,8 +151,11 @@ def open_histore2(v, histore_dict):
     data = histore_dict[v]
     entry_ctk.delete(0, customtkinter.END)
     entry_ctk.insert(0, data['e'])
+    histore_name_CTkEntry.delete(0, customtkinter.END)
+    histore_name_CTkEntry.insert(0, v)
+
     text_box_ctk.delete("1.0", "end")
-    text_box_ctk.insert("1.0", data['b'])
+    text_box_ctk.insert("1.0", data['b'][0:-1])
     frame_histore.destroy()
 
 def save_in_histore():
